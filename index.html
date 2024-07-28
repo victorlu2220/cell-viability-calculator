@@ -27,9 +27,18 @@
     <br><br>
     <label for="blueMin">Blue Min</label>
     <input type="number" id="blueMin" step="1" value="90">
+    <br><br>
     <label for="redMin">Red Min</label>
     <input type="number" id="redMin" step="1" value="105">
+    <br><br>
     <button onclick="analyzeImage()">Confirm</button>
+    <h2> Code Logic </h2>
+    <p style="text-align:left; font-size: 20px"> The code first recognizes cell-free regions(white) so that they don't interfere with the subsequent calculation; 
+        then it runs cell viability calculation based on the remaining part of the uploaded image. </p>
+    <h2> Suggestions </h2>
+    <p> If you see excessive regions are whitened, then you should raise the Blue Min; </p>
+    <p> likewise, if you see excessive regions are reddened, then you should raise the Red Min; </p>
+
 
     <p id="result"></p>
 
