@@ -32,15 +32,15 @@
     <input type="number" id="redMin" step="1" value="105">
     <br><br>
     <button onclick="analyzeImage()">Confirm</button>
+    <p id="result" style="font-size:xx-large;"></p>
+    <br><br>
     <h2> Code Logic </h2>
-    <p style="text-align:left; font-size: 20px"> The code first recognizes cell-free regions(white) so that they don't interfere with the subsequent calculation; 
-        then it runs cell viability calculation based on the remaining part of the uploaded image. </p>
+    <p style="text-align:left; font-size: 20px"> &nbsp &nbsp &nbsp The code first recognizes cell-free regions(white) so that 
+        they don't interfere with the subsequent calculation; then it runs cell viability calculation based on the remaining 
+        part of the uploaded image. </p>
     <h2> Suggestions </h2>
     <p> If you see excessive regions are whitened, then you should raise the Blue Min; </p>
     <p> likewise, if you see excessive regions are reddened, then you should raise the Red Min; </p>
-
-
-    <p id="result"></p>
 
     <script>
         function uploadImage() {
