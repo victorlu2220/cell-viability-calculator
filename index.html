@@ -10,102 +10,71 @@
             color: white;
             text-align: center;
         }
-        #originalCanvas, #processedCanvas {
+        #originalCanvas, #processedCanvas, #croppedCanvas {
             border: 1px solid white;
             margin: 10px;
+        }
+        .error-message {
+            color: red;
+            font-size: large;
         }
     </style>
 </head>
 <body>
     <h1>Cell Viability Calculator</h1>
+    <div id="error-message" class="error-message"></div>
     <input type="file" id="fileInput" accept=".png, .jpg, .jpeg" style="display:none" onchange="displayImage(event)">
     <br>
     <button onclick="uploadImage()">Upload Image</button>
     <br><br>
     <canvas id="originalCanvas" style="max-width: 400px; max-height: 400px;"></canvas>
+    <canvas id="croppedCanvas" style="max-width: 400px; max-height: 400px;"></canvas>
     <canvas id="processedCanvas" style="max-width: 400px; max-height: 400px;"></canvas>
     <br><br>
-    <label for="blueMin">Blue Min</label>
-    <input type="number" id="blueMin" step="1" value="90">
+    <label for="blueMinCrop">Blue Min for Cropping</label>
+    <input type="number" id="blueMinCrop" step="1" value="112">
     <br><br>
-    <label for="redMin">Red Min</label>
-    <input type="number" id="redMin" step="1" value="105">
+    <label for="redMinCrop">Red Min for Cropping</label>
+    <input type="number" id="redMinCrop" step="1" value="101">
+    <br><br>
+    <button onclick="cropImage()">Crop</button>
+    <br><br>
+    <label for="blueMinCal">Blue Min for Calculation</label>
+    <input type="number" id="blueMinCal" step="1" value="120">
+    <br><br>
+    <label for="redMinCal">Red Min for Calculation</label>
+    <input type="number" id="redMinCal" step="1" value="140">
     <br><br>
     <button onclick="analyzeImage()">Confirm</button>
     <p id="result" style="font-size:xx-large;"></p>
-    <br><br>
-    <h2> Code Logic </h2>
-    <p style="text-align:left; font-size: 20px"> &nbsp &nbsp &nbsp The code first recognizes cell-free regions(white) so that 
-        they don't interfere with the subsequent calculation; then it runs cell viability calculation based on the remaining 
-        part of the uploaded image. </p>
-    <h2> Suggestions </h2>
-    <p> If you see excessive regions are whitened, then you should raise the Blue Min; </p>
-    <p> likewise, if you see excessive regions are reddened, then you should raise the Red Min; </p>
+    <br>
 
-    <script>
-        function uploadImage() {
-            document.getElementById('fileInput').click();
-        }
 
-        function displayImage(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imgElement = new Image();
-                    imgElement.onload = function() {
-                        const originalCanvas = document.getElementById('originalCanvas');
-                        const ctx = originalCanvas.getContext('2d');
-                        originalCanvas.width = imgElement.width;
-                        originalCanvas.height = imgElement.height;
-                        ctx.drawImage(imgElement, 0, 0);
-                    };
-                    imgElement.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
+    <hr>
+    <h2>Code Logic</h2>
+    <p style="text-align:left; font-size: 20px">The code first crops the uploaded image if it sees apparent grey or sharp 
+        green area. Then it recognizes cell-free regions (white) so that they don't interfere with the subsequent calculation; 
+        Finally, it runs cell viability calculation(dead_cell_area/overall_colored_area) based on the remaining part of the uploaded image.</p>
 
-        function analyzeImage() {
-            const originalCanvas = document.getElementById('originalCanvas');
-            const originalCtx = originalCanvas.getContext('2d');
-            const processedCanvas = document.getElementById('processedCanvas');
-            const processedCtx = processedCanvas.getContext('2d');
-            
-            processedCanvas.width = originalCanvas.width;
-            processedCanvas.height = originalCanvas.height;
-            
-            const imageData = originalCtx.getImageData(0, 0, originalCanvas.width, originalCanvas.height);
-            const data = imageData.data;
-            const blueMin = parseInt(document.getElementById('blueMin').value);
-            const redMin = parseInt(document.getElementById('redMin').value);
 
-            let dead_count = 0;
-            let overall_count = 0;
+    <hr>
+    <h2>Variable Definitions</h2>
+    <li style="text-align:left; font-size: 20px">Blue Min for Cropping: threshold for a row to be identified as a cell-free, vacant region. If the average of the blue values of the row is below this threshold, the row will be used as the starting row for our cropped image</li>
+    <br>
+    <li style="text-align:left; font-size: 20px">Red Min for Cropping: threshold for a row to be identified as a cell-free dentin region. If the average of the red values of the row is below this threshold, the row will be used as the final row for our cropped image</li>
+    <br>
+    <li style="text-align:left; font-size: 20px">Blue Min for Calculation: it checks if a point in space is grey enough, if it is, then it will be identified as cell-free region and won't involve in final calculation. </li>
+    <br>
+    <li style="text-align:left; font-size: 20px">Red Min for Calculation: it checks if a point in space is red enough, if it is, then it will be identified as dead cell region. </li>
+    
+    
+    <hr>
+    <h2>Suggestions</h2>
+    <ol style="text-align:left; font-size: 20px">if excessive regions are being cropped on top, that means the first row is too "late". You should raise the "Blue Min for Cropping". </ol>
+    <ol style="text-align:left; font-size: 20px">if excessive regions are being cropped on bottom, that means the last row is too "early". You should lower the "Blue Min for Cropping".</ol>
+    <ol style="text-align:left; font-size: 20px">If you see excessive regions are whitened, then you should raise the Blue Min.</ol>
+    <ol style="text-align:left; font-size: 20px">Likewise, if you see excessive regions are reddened, then you should raise the Red Min.</ol>
 
-            for (let i = 0; i < data.length; i += 4) {
-                const r = data[i];
-                const g = data[i + 1];
-                const b = data[i + 2];
-
-                if (b >= blueMin) {
-                    data[i] = 255;
-                    data[i + 1] = 255;
-                    data[i + 2] = 255;
-                    continue;
-                } else if (r >= redMin) {
-                    data[i] = 255;
-                    data[i + 1] = 0;
-                    data[i + 2] = 0;
-                    dead_count++;
-                }
-                overall_count++;
-            }
-
-            processedCtx.putImageData(imageData, 0, 0);
-            const viability = 1 - dead_count / overall_count;
-            document.getElementById('result').innerText = `The overall cell viability is ${viability}`;
-        }
-    </script>
+    <script src="image processor.js"></script>
 </body>
 </html>
