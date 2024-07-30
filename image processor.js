@@ -112,7 +112,7 @@ function analyzeImage() {
         const g = data[i + 1];
         const b = data[i + 2];
 
-        if (b >= blueMin) {
+        if (b >= blueMin || (r <= 40 && g <= 40 && b <= 40) || ((r >= 220 && g >= 220 && b >= 220) )) {
             data[i] = 255;
             data[i + 1] = 255;
             data[i + 2] = 255;
@@ -128,5 +128,5 @@ function analyzeImage() {
 
     processedCtx.putImageData(imageData, 0, 0);
     const viability = 1 - dead_count / overall_count;
-    document.getElementById('result').innerText = `The overall cell viability is ${viability.toFixed(2)}`;
+    document.getElementById('result').innerText = `The overall cell viability is ${viability.toFixed(5)}`;
 }
