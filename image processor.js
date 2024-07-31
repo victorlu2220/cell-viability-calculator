@@ -102,6 +102,7 @@ function analyzeImage() {
     const imageData = ctxToAnalyze.getImageData(0, 0, canvasToAnalyze.width, canvasToAnalyze.height);
     const data = imageData.data;
     const blueMin = parseInt(document.getElementById('blueMinCal').value);
+    const greenMin = parseInt(document.getElementById('greenMinCal').value);
     const redMin = parseInt(document.getElementById('redMinCal').value);
 
     let dead_count = 0;
@@ -112,7 +113,9 @@ function analyzeImage() {
         const g = data[i + 1];
         const b = data[i + 2];
 
-        if (b >= blueMin || (r <= 40 && g <= 40 && b <= 40) || ((r >= 220 && g >= 220 && b >= 220) )) {
+        // if ((r <= 40 && g <= 40 && b <= 40) || ((r >= 220 && g >= 220 && b >= 220) || g <= greenMin || r <= redMin)) {
+
+        if (b >= blueMin || (r <= 40 && g <= 40 && b <= 40) || ((r >= 220 && g >= 220 && b >= 220) || (g <= greenMin && r <= redMin))) {
             data[i] = 255;
             data[i + 1] = 255;
             data[i + 2] = 255;
