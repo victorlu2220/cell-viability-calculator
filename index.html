@@ -31,18 +31,29 @@
     <canvas id="croppedCanvas" style="max-width: 400px; max-height: 400px;"></canvas>
     <canvas id="processedCanvas" style="max-width: 400px; max-height: 400px;"></canvas>
     <br><br>
-    <label for="blueMinCrop">Blue Min for Cropping</label>
-    <input type="number" id="blueMinCrop" step="1" value="112">
+    <h2> Parameters(n ∈ [0, 255]) </h2>
+    <h3> Cropping(not required) </h3>
+    <p>    <li style="color: red;"> DON'T USE IF YOUR DEAD CELLS ARE SPARSELY DISTRIBUTED VERTICALLY </li>  </p>
+    <br>
+    <label for="blueMinCrop">Crop out rows with average b values above(top edge)<sup>1</sup>: </label>
+    <input type="number" id="blueMinCrop" step="1" value="110">
     <br><br>
-    <label for="redMinCrop">Red Min for Cropping</label>
-    <input type="number" id="redMinCrop" step="1" value="101">
+    <label for="redMinCrop">Crop out rows with average r values below(bottom edge)<sup>2</sup>: </label>
+    <input type="number" id="redMinCrop" step="1" value="100">
     <br><br>
     <button onclick="cropImage()">Crop</button>
     <br><br>
-    <label for="blueMinCal">Blue Min for Calculation</label>
+    <h3> Filtering(gray space, REQUIRED) </h3>
+    <br>
+    <label for="blueMinCal">Cell free regions have b values above<sup>3</sup>: </label>
     <input type="number" id="blueMinCal" step="1" value="120">
     <br><br>
-    <label for="redMinCal">Red Min for Calculation</label>
+    <h3> Calculation(REQUIRED) </h3>
+    <br>
+    <label for="greenMinCal">Live cell regions have g values above<sup>4</sup>: </label>
+    <input type="number" id="greenMinCal" step="1" value="100">
+    <br><br>
+    <label for="redMinCal">Dead cell regions have r values above<sup>5</sup>: </label>
     <input type="number" id="redMinCal" step="1" value="140">
     <br><br>
     <button onclick="analyzeImage()">Confirm</button>
@@ -56,23 +67,24 @@
         green area. Then it recognizes cell-free regions (white) so that they don't interfere with the subsequent calculation; 
         Finally, it runs cell viability calculation(dead_cell_area/overall_colored_area) based on the remaining part of the uploaded image.</p>
 
-
     <hr>
     <h2>Variable Definitions</h2>
-    <li style="text-align:left; font-size: 20px">Blue Min for Cropping: threshold for a row to be identified as a cell-free, vacant region. If the average of the blue values of the row is below this threshold, the row will be used as the starting row for our cropped image</li>
+    <li style="text-align:left; font-size: 20px">1: threshold for A ROW to be identified as a cell-free, vacant region. If the average of the blue values of the row is below this threshold, the row will be used as the starting row for our cropped image</li>
     <br>
-    <li style="text-align:left; font-size: 20px">Red Min for Cropping: threshold for a row to be identified as a cell-free dentin region. If the average of the red values of the row is below this threshold, the row will be used as the final row for our cropped image</li>
+    <li style="text-align:left; font-size: 20px">2: threshold for A ROW to be identified as a cell-free dentin region. If the average of the red values of the row is below this threshold, the row will be used as the final row for our cropped image</li>
     <br>
-    <li style="text-align:left; font-size: 20px">Blue Min for Calculation: it checks if a point in space is grey enough, if it is, then it will be identified as cell-free region and won't involve in final calculation. </li>
+    <li style="text-align:left; font-size: 20px">3: it checks if a point in space is grey enough, if it is, then it will be identified as cell-free region, whitened in the last image box and won't involve in final calculation. </li>
     <br>
-    <li style="text-align:left; font-size: 20px">Red Min for Calculation: it checks if a point in space is red enough, if it is, then it will be identified as dead cell region. </li>
+    <li style="text-align:left; font-size: 20px">4: it checks if a point in space is green enough. If it is, it will be identified as a live cell region. </li>
+    <br>
+    <li style="text-align:left; font-size: 20px">5: it checks if a point in space is red enough, if it is, then it will be identified as dead cell region. </li>
     
     
     <hr>
     <h2>Suggestions</h2>
-    <ol style="text-align:left; font-size: 20px">if excessive regions are being cropped on top, that means the first row is too "late". You should raise the "Blue Min for Cropping". </ol>
-    <ol style="text-align:left; font-size: 20px">if excessive regions are being cropped on bottom, that means the last row is too "early". You should lower the "Blue Min for Cropping".</ol>
-    <ol style="text-align:left; font-size: 20px">If you see excessive regions are whitened, then you should raise the Blue Min.</ol>
+    <ol style="text-align:left; font-size: 20px">if excessive regions are being cropped on top, that means the first row is identified too "late". You should raise the "Blue Min for Cropping". </ol>
+    <ol style="text-align:left; font-size: 20px">if excessive regions are being cropped on bottom, that means the last row is identified too "early". You should lower the "Blue Min for Cropping".</ol>
+    <ol style="text-align:left; font-size: 20px">If you see excessive regions are whitened in your final image, then you should raise the Blue Min.</ol>
     <ol style="text-align:left; font-size: 20px">Likewise, if you see excessive regions are reddened, then you should raise the Red Min.</ol>
 
     <script src="image processor.js"></script>
